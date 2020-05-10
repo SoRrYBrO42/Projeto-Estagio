@@ -9,7 +9,7 @@
 <body>
 	<?php require ('nav.php'); ?>
 	<div>
-		<form>
+		<form method="POST">
 			<img id="foto_place" src="fotos/
 				<?php 
 					if (isset($_GET['id_treinador'])){
@@ -50,6 +50,7 @@
 				</select><br>
 			<label>Data de nascimento:</label>
 				<input type="date" name="dt_nasc"><br>
+			<input type="submit" name="insert" value="Inserir">
 		</form>
 	</div>
 </body>
