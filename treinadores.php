@@ -1,5 +1,28 @@
 <?php 
 	require ('ligacao.php');
+	if (isset($_POST['insert'])) {
+		$querry = $con->prepare("INSERT INTO `treinadores`(`num_treinador`, `password`, `nome`, `morada`, `email`, `telemovel`, `nivel`, `sexo`, `dt_nasc`, `foto`) VALUES (?,?,?,?,?,?,?,?,?,?)");
+		if ($_POST['password']=='') {
+			$_POST['password']='1234';
+		}
+		$querry->bind_param("sssssiisss",($_POST['letra'].$_POST['num_treinador']), $_POST['password'],$_POST['nome'],$_POST['morada'],$_POST['email'],$_POST['telemovel'],$_POST['nivel'],$_POST['sexo'],$_POST['dt_nasc'],$_POST['foto']);
+
+		$querry->execute();
+		if($querry->affected_rows === 0){
+			?>
+				<script type="text/javascript">
+					alert("Algo não esperado ocurreu.");
+				</script>
+			<?php
+			$querry->close();
+		}else{
+			?>
+				<script type="text/javascript">
+					alert("Registo inserido com sucesso");
+				</script>
+			<?php
+		}
+	}
 ?>
 <!DOCTYPE html>
 <html>
@@ -31,8 +54,9 @@
 			<label>Escolher a foto</label><br>
     			<input type="file" name="foto" accept="image/png, image/jpeg"><br>
 			<label>Número de treinador:</label>
-				<input name="Letra" disabled value="T"><input name="num_treinador">
-			<label>Nivel:</label><input type="" name=""><br>
+				<input name="letra" value="T"><input name="num_treinador">
+			<label>Nivel:</label>
+				<input name="nivel"><br>
 			<label>Palavra-Passe:</label>
 				<input type="password" name="password"><br>
 			<label>Nome:</label>
