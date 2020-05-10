@@ -36,6 +36,7 @@
 			$row = $resultado->fetch_row();
 			$_SESSION['id']=$row[0];
 			$_SESSION['nome']=$row[1];
+			
 			//fecha a query
 			$stmt->close();
 			//redireciona para a home
