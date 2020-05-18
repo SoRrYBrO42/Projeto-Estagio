@@ -1,33 +1,11 @@
 <?php 
 	require ('ligacao.php');
-	if (isset($_POST['insert'])) {
-		$querry = $con->prepare("INSERT INTO `treinadores`(`num_treinador`, `password`, `nome`, `morada`, `email`, `telemovel`, `nivel`, `sexo`, `dt_nasc`, `foto`) VALUES (?,?,?,?,?,?,?,?,?,?)");
-		if ($_POST['password']=='') {
-			$_POST['password']='1234';
-		}
-		$querry->bind_param("sssssiisss",($_POST['letra'].$_POST['num_treinador']), $_POST['password'],$_POST['nome'],$_POST['morada'],$_POST['email'],$_POST['telemovel'],$_POST['nivel'],$_POST['sexo'],$_POST['dt_nasc'],$_POST['foto']);
 
-		$querry->execute();
-		if($querry->affected_rows === 0){
-			?>
-				<script type="text/javascript">
-					alert("Algo não esperado ocurreu.");
-				</script>
-			<?php
-			$querry->close();
-		}else{
-			?>
-				<script type="text/javascript">
-					alert("Registo inserido com sucesso");
-				</script>
-			<?php
-		}
-	}
 ?>
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Treinadores</title>
+	<title>Recursos humanos</title>
 </head>
 <body>
 	<?php require ('nav.php'); ?>
