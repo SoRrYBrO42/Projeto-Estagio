@@ -122,6 +122,15 @@
 	<body>
 		<?php require ('nav.php'); ?>
 		<div>
+			<?php 
+				if (isset($_GET['id_recurso_humano'])) {
+					$recursos_humanos=$con->prepare("SELECT * FROM recursos_humanos WHERE id_recurso_humano=?");
+					$recursos_humanos->bind_param("i",$_GET['id_recurso_humano']);
+					$recursos_humanos->execute();
+					$resultado=$recursos_humanos->get_result();
+					$linha=$resultado->fetch_assoc();
+				}
+			?>
 			<form method="POST" enctype="multipart/form-data">
 				<img id="foto_place" src="fotos/
 					<?php 
@@ -145,23 +154,23 @@
 	    			<input type="file" id="foto" name="foto" accept="image/png, image/jpeg"><br>
 				<label>Cargos:</label><br>
 					<?php 
-						$querry = $con->prepare("SELECT * FROM cargos");
-						$querry->execute();
-						$resultado=$querry->get_result();
+						$cargos = $con->prepare("SELECT * FROM cargos");
+						$cargos->execute();
+						$resultado=$cargos->get_result();
 						if($resultado->num_rows === 0){ 
 							echo "Não existem cargos disponiveis.";
 						}else{
-							while ($linha=$resultado->fetch_assoc()) { ?>
+							while ($linha_cargo=$resultado->fetch_assoc()) { ?>
 								<label>
 									<?php 
-										echo($linha['cargo']);
-										if (strpos($linha['cargo'],'Treinador')!==false) {
+										echo($linha_cargo['cargo']);
+										if (strpos($linha_cargo['cargo'],'Treinador')!==false) {
 											?>
-												<input onclick="alert('função que faz aparecer os campos do treinador.');" type="checkbox" id="<?php echo($linha['id_cargo']); ?>" name="cargo[]">
+												<input onclick="alert('função que faz aparecer os campos do treinador.');" type="checkbox" id="<?php echo($linha_cargo['id_cargo']); ?>" name="cargo[]">
 											<?php
 										}else{
 											?>
-												<input type="checkbox" id="<?php echo($linha['id_cargo']); ?>" name="cargo[]">
+												<input type="checkbox" id="<?php echo($linha_cargo['id_cargo']); ?>" name="cargo[]">
 
 											<?php
 										}
@@ -210,6 +219,8 @@
 		</div>
 	</body>
 </html>
+
+
 <!--Faz upload da foto para mostrar no site-->
 <script type="text/javascript">
 	function readURL(input) {
@@ -227,6 +238,7 @@
 		readURL(this);
 	});
 </script>
+
 <?php
 	if (!isset($_GET['id_recurso_humano'])) {
 		?>
