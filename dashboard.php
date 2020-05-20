@@ -1,4 +1,4 @@
-
+<?php include("ligacao.php"); ?>
 <html lang="en">
       <?php include('head.php'); ?>
   <body>
