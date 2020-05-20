@@ -1,4 +1,4 @@
-<?php require('conn.php'); ?>
+<?php require('ligacao.php'); ?>
 <html>
 <?php include('head.php'); ?>
 <body>
