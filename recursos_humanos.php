@@ -160,24 +160,42 @@
 						if($resultado->num_rows === 0){ 
 							echo "Não existem cargos disponiveis.";
 						}else{
-							while ($linha_cargo=$resultado->fetch_assoc()) { ?>
-								<label>
-									<?php 
-										echo($linha_cargo['cargo']);
-										if (strpos($linha_cargo['cargo'],'Treinador')!==false) {
-											?>
-												<input onclick="alert('função que faz aparecer os campos do treinador.');" type="checkbox" id="<?php echo($linha_cargo['id_cargo']); ?>" name="cargo[]">
-											<?php
-										}else{
-											?>
-												<input type="checkbox" id="<?php echo($linha_cargo['id_cargo']); ?>" name="cargo[]">
+							if (isset($_GET['id_recurso_humano'])) {
+								while ($linha_cargo=$resultado->fetch_assoc()) { ?>
+									<label>
+										<?php 
+											echo($linha_cargo['cargo']);
+											if (strpos($linha_cargo['cargo'],'Treinador')!==false) {
+												?>
+													<input onclick="alert('função que faz aparecer os campos do treinador.');" type="checkbox" id="<?php echo($linha_cargo['id_cargo']); ?>" name="cargo[]">
+												<?php
+											}else{
+												?>
+													<input type="checkbox" id="<?php echo($linha_cargo['id_cargo']); ?>" name="cargo[]">
 
-											<?php
-										}
-									?>
-								</label>
-								<br>
-							<?php
+												<?php
+											}
+										?>
+									</label><br>
+								<?php
+								}
+							}else{
+								while ($linha_cargo=$resultado->fetch_assoc()) { ?>
+									<label>
+										<?php 
+											echo($linha_cargo['cargo']);
+											if (strpos($linha_cargo['cargo'],'Treinador')!==false) {
+													<input onclick="alert('função que faz aparecer os campos do treinador.');" type="checkbox" id="<?php echo($linha_cargo['id_cargo']); ?>" name="cargo[]">
+												<?php
+											}else{
+												?>
+													<input type="checkbox" id="<?php echo($linha_cargo['id_cargo']); ?>" name="cargo[]">
+												<?php
+											}
+										?>
+									</label><br>
+								<?php
+								}
 							}	
 						}
 					?>
