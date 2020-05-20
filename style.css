@@ -1,0 +1,103 @@
+/*
+
+Esquema de cores
+
+
+Verde Claro - 85FFC7
+Verde Escuro - 297373
+Laranja/Coral - FF8552
+Branco -  E6E6E6
+Preto - 39393a
+
+
+*/
+
+body{
+	background-color: #39393a;
+}
+
+h1, h2, h3 {
+	color:#E6E6E6;
+
+	}
+
+li a{
+	color: #85FFC7 ;
+}
+li a:hover{
+	color: #297373;
+}
+
+p {
+	color: #E6E6E6;
+}
+
+
+header{
+	background-image: url(bg2.jpg);
+}
+
+#contact {
+	color: #E6E6E6;
+}
+
+
+a{
+	color: #85FFC7 ;
+}
+
+a:hover{
+	color: #297373;
+}
+
+.card-body p {
+
+	color: #39393a;
+}
+
+.btn-default, .btn-default:active, .btn-default:visited {
+    background-color: #297373 !important;
+    color:#E6E6E6;
+    outline: none !important;
+}
+
+.btn-default:hover {
+	background-color: #FF8552 !important;
+    color:#E6E6E6;
+
+
+}
+
+footer {
+	background-color: #FF8552;
+}
+
+.list-group-item {
+
+	background-color: #39393a;
+
+}
+
+.list-group-item {
+
+	background-color: #39393a;
+
+}
+
+#collapseExample {
+	background-color: #FF8552;
+}
+
+.card-header h3{
+
+color: #297373;
+
+}
+
+.navbar{
+
+	background-color: #FF8552;
+    padding-down:20px;
+
+
+}
