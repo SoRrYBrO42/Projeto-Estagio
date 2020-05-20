@@ -14,7 +14,7 @@
               <a class="nav-link" href="dashboard.php">Home</span></a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="products.php">Products</a>
+              <a class="nav-link" href="recursos_humanos.php">Recursos humanos</a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="#">Pricing</a>
