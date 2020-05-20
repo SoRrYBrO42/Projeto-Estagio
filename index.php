@@ -40,7 +40,7 @@
 			//fecha a query
 			$stmt->close();
 			//redireciona para a home
-			header("Location: home.php");
+			header("Location: dashboard.php");
 		}	
 	}
 ?>
