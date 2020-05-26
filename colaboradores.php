@@ -340,7 +340,7 @@
 											if($resultado_tabela->num_rows === 0){ 
 												if (strpos($linha_cargo['cargo'],'Treinador')!==false) {
 													?>
-														<input onclick="alert('função que faz aparecer os campos do treinador.');" type="checkbox" id="<?php echo($linha_cargo['id_cargo']); ?>" name="cargo[]">
+														<input onclick="treinador_campos()" type="checkbox" id="<?php echo($linha_cargo['id_cargo']); ?>" name="cargo[]">
 													<?php
 												}else{
 													?>
@@ -618,5 +618,7 @@
 	}
 ?>
 <script type="text/javascript">
+	function treinador_campos(){
 
+	}
 </script>
