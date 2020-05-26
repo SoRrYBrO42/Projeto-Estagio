@@ -278,195 +278,225 @@
 				<?php if (isset($_GET['id_colaborador'])) { ?>
 					<input name="id_colaborador" hidden value="<?php echo $linha['id_recurso_humano']; ?>">
 				<?php } ?>
-				<img id="foto_place" src="
-					<?php 
-						if (isset($_GET['id_colaborador'])){
-							echo 'data:image/jpeg;base64,'.base64_encode($linha["foto"]);
-						}elseif (isset($_POST['insert']) or isset($_POST['update'])){
-							if($_POST['sexo']=='Masculino'){
-								echo("fotos/Male_user.png");
+				<div>
+					<img id="foto_place" src="
+						<?php 
+							if (isset($_GET['id_colaborador'])){
+								echo 'data:image/jpeg;base64,'.base64_encode($linha["foto"]);
+							}elseif (isset($_POST['insert']) or isset($_POST['update'])){
+								if($_POST['sexo']=='Masculino'){
+									echo("fotos/Male_user.png");
+								}else{
+									echo("fotos/Female_user.png");
+								}
 							}else{
-								echo("fotos/Female_user.png");
-							}
-						}else{
-							echo"fotos/Male_user.png";
-						} 
-					?>" alt="Foto do treinador" height="200" width="200"><br>
-				<label>Escolher a foto</label>
-	    			<input type="file" id="foto" name="foto" accept="image/png, image/jpeg"><br>
-				<label>Cargos:</label><br>
-					<?php 
-						//busca todos os cargos existentes na tabela cargos.
-						$cargos = $con->prepare("SELECT * FROM cargos");
-						$cargos->execute();
-						$resultado=$cargos->get_result();
+								echo"fotos/Male_user.png";
+							} 
+						?>" alt="Foto do treinador" height="200" width="200"><br>
+					<label>Escolher a foto</label>
+						<input type="file" id="foto" name="foto" accept="image/png, image/jpeg"><br>
+				</div>
+				<div>
+					<label>Cargos:</label><br>
+						<?php 
+							//busca todos os cargos existentes na tabela cargos.
+							$cargos = $con->prepare("SELECT * FROM cargos");
+							$cargos->execute();
+							$resultado=$cargos->get_result();
 
-						//Confirma se existem cargos.
-						if($resultado->num_rows === 0){ 
-							echo "Não existem cargos disponiveis.<br>";
-						}else{
-							//Se um humano nao tiver selecionado.
-							if (!isset($_GET['id_colaborador'])) {
-								//Escreve os cargos e as respetivas checkboxes.
-								while ($linha_cargo=$resultado->fetch_assoc()) { 
-									?>
+							//Confirma se existem cargos.
+							if($resultado->num_rows === 0){ 
+								echo "Não existem cargos disponiveis.<br>";
+							}else{
+								//Se um humano nao tiver selecionado.
+								if (!isset($_GET['id_colaborador'])) {
+									//Escreve os cargos e as respetivas checkboxes.
+									while ($linha_cargo=$resultado->fetch_assoc()) { 
+										?>
+											<label>
+												<?php 
+													echo($linha_cargo['cargo']);
+													if (strpos($linha_cargo['cargo'],'reinador')!==false) {
+														?>
+															<input onclick="alert('função que faz aparecer os campos do treinador.');" type="checkbox" id="<?php echo($linha_cargo['id_cargo']); ?>" name="cargo[]">
+														<?php
+													}else{
+														?>
+															<input type="checkbox" id="<?php echo($linha_cargo['id_cargo']); ?>" name="cargo[]">
+														<?php
+													}
+												?>
+											</label><br>
+										<?php
+									}
+								}else{
+									//se tiver selecionado verifica quais os cargos daquela pessoa e faz check das mesmas.
+									while ($linha_cargo=$resultado->fetch_assoc()) { ?>
 										<label>
-											<?php 
+											<?php
+												$cargo_recurso=$con->prepare("SELECT * FROM cargos_recursos WHERE id_cargo=? AND id_recurso_humano=?");
+												$cargo_recurso->bind_param("ii",$linha_cargo['id_cargo'],$linha['id_colaborador']);
+												$cargo_recurso->execute();
+												$resultado_tabela=$cargo_recurso->get_result();
+												
 												echo($linha_cargo['cargo']);
-												if (strpos($linha_cargo['cargo'],'reinador')!==false) {
-													?>
-														<input onclick="alert('função que faz aparecer os campos do treinador.');" type="checkbox" id="<?php echo($linha_cargo['id_cargo']); ?>" name="cargo[]">
-													<?php
+												if($resultado_tabela->num_rows === 0){ 
+													if (strpos($linha_cargo['cargo'],'Treinador')!==false) {
+														?>
+															<input onclick="treinador_campos()" type="checkbox" id="<?php echo($linha_cargo['id_cargo']); ?>" name="cargo[]">
+														<?php
+													}else{
+														?>
+															<input type="checkbox" id="<?php echo($linha_cargo['id_cargo']); ?>" name="cargo[]">
+														<?php
+													}
 												}else{
-													?>
-														<input type="checkbox" id="<?php echo($linha_cargo['id_cargo']); ?>" name="cargo[]">
-													<?php
+													if (strpos($linha_cargo['cargo'],'Treinador')!==false) {
+														?>
+															<input checked onclick="alert('função que faz aparecer os campos do treinador.');" type="checkbox" id="<?php echo($linha_cargo['id_cargo']); ?>" name="cargo[]">
+														<?php
+													}else{
+														?>
+															<input checked type="checkbox" id="<?php echo($linha_cargo['id_cargo']); ?>" name="cargo[]">
+														<?php
+													}
 												}
 											?>
 										</label><br>
 									<?php
-								}
-							}else{
-								//se tiver selecionado verifica quais os cargos daquela pessoa e faz check das mesmas.
-								while ($linha_cargo=$resultado->fetch_assoc()) { ?>
-									<label>
-										<?php
-											$cargo_recurso=$con->prepare("SELECT * FROM cargos_recursos WHERE id_cargo=? AND id_recurso_humano=?");
-											$cargo_recurso->bind_param("ii",$linha_cargo['id_cargo'],$linha['id_colaborador']);
-											$cargo_recurso->execute();
-											$resultado_tabela=$cargo_recurso->get_result();
-											
-											echo($linha_cargo['cargo']);
-											if($resultado_tabela->num_rows === 0){ 
-												if (strpos($linha_cargo['cargo'],'Treinador')!==false) {
-													?>
-														<input onclick="treinador_campos()" type="checkbox" id="<?php echo($linha_cargo['id_cargo']); ?>" name="cargo[]">
-													<?php
-												}else{
-													?>
-														<input type="checkbox" id="<?php echo($linha_cargo['id_cargo']); ?>" name="cargo[]">
-													<?php
-												}
-											}else{
-												if (strpos($linha_cargo['cargo'],'Treinador')!==false) {
-													?>
-														<input checked onclick="alert('função que faz aparecer os campos do treinador.');" type="checkbox" id="<?php echo($linha_cargo['id_cargo']); ?>" name="cargo[]">
-													<?php
-												}else{
-													?>
-														<input checked type="checkbox" id="<?php echo($linha_cargo['id_cargo']); ?>" name="cargo[]">
-													<?php
-												}
-											}
-										?>
-									</label><br>
-								<?php
-								}
-							}	
-						}
-					?>
-				<label>Salario:</label>
-					<input name="salario" value="<?php 
-							if (isset($_GET['id_colaborador'])) {
-								echo($linha['salario']);
-							}elseif (isset($_POST['insert']) || isset($_POST['update'])){
-								echo($_POST['salario']);
-							} 
-						?>">€<br>
-				<label>Nome:</label>
-					<input name="nome" value="<?php 
-							if (isset($_GET['id_colaborador'])) {
-								echo($linha['nome']);
-							}elseif (isset($_POST['insert']) || isset($_POST['update'])){
-								echo($_POST['nome']);
-							} 
-						?>"><br>
-				<label>CC:</label>
-					<input name="cc" value="<?php 
-							if (isset($_GET['id_colaborador'])) {
-								echo($linha['CC']);
-							}elseif (isset($_POST['insert']) || isset($_POST['update'])){
-								echo($_POST['cc']);
-							} 
-						?>"><br>
-				<label>NIF:</label>
-					<input name="nif" value="<?php 
-							if (isset($_GET['id_colaborador'])) {
-								echo($linha['NIF']);
-							}elseif (isset($_POST['insert']) || isset($_POST['update'])){
-								echo($_POST['nif']);
-							} 
-						?>"><br>
-				<label>Morada:</label>
-					<input name="morada" value="<?php 
-							if (isset($_GET['id_colaborador'])) {
-								echo($linha['morada']);
-							}elseif (isset($_POST['insert']) || isset($_POST['update'])){
-								echo($_POST['morada']);
-							} 
-						?>"><br>
-				<label>Localidade:</label>
-					<input name="localidade" value="<?php 
-							if (isset($_GET['id_colaborador'])) {
-								echo($linha['localidade']);
-							}elseif (isset($_POST['insert']) || isset($_POST['update'])){
-								echo($_POST['localidade']);
-							} 
-						?>"><br>
-				<label>Freguesia:</label>
-					<input name="freguesia" value="<?php 
-							if (isset($_GET['id_colaborador'])) {
-								echo($linha['freguesia']);
-							}elseif (isset($_POST['insert']) || isset($_POST['update'])){
-								echo($_POST['freguesia']);
-							} 
-						?>"><br>
-				<label>Concelho:</label>
-					<input name="concelho" value="<?php 
-							if (isset($_GET['id_colaborador'])) {
-								echo($linha['concelho']);
-							}elseif (isset($_POST['insert']) || isset($_POST['update'])){
-								echo($_POST['concelho']);
-							} 
-						?>"><br>
-				<label>CP:</label>
-					<input name="cp" value="<?php 
-							if (isset($_GET['id_colaborador'])) {
-								echo($linha['CP']);
-							}elseif (isset($_POST['insert']) || isset($_POST['update'])){
-								echo($_POST['cp']);
-							} 
-						?>"><br>
-				<label>Email:</label>
-					<input name="email" value="<?php 
-							if (isset($_GET['id_colaborador'])) {
-								echo($linha['email']);
-							}elseif (isset($_POST['insert']) || isset($_POST['update'])){
-								echo($_POST['email']);
-							} 
-						?>"><br>
-				<label>Telemovel:</label>
-					<input name="telemovel" value="<?php 
-							if (isset($_GET['id_colaborador'])) {
-								echo($linha['telemovel']);
-							}elseif (isset($_POST['insert']) || isset($_POST['update'])){
-								echo($_POST['telemovel']);
-							} 
-						?>"><br>
-				<label>Sexo:</label>
-					<select id="sexo" name="sexo" onchange="mudar_imagem()">
-						<option value="Masculino">Masculino</option>
-						<option value="Feminino">Feminino</option>
-					</select><br>
-				<label>Data de nascimento:</label>
-					<input type="date" name="dt_nasc" value="<?php 
-							if (isset($_GET['id_colaborador'])) {
-								echo($linha['dt_nasc']);
-							}elseif (isset($_POST['insert']) || isset($_POST['update'])){
-								echo($_POST['dt_nasc']);
-							} 
-						?>"><br>
-				
+									}
+								}	
+							}
+						?>
+				</div>
+				<div>
+					<label>Salario:</label>
+						<input name="salario" value="<?php 
+								if (isset($_GET['id_colaborador'])) {
+									echo($linha['salario']);
+								}elseif (isset($_POST['insert']) || isset($_POST['update'])){
+									echo($_POST['salario']);
+								} 
+							?>">€<br>
+				</div>
+				<div>
+					<label>Nome:</label>
+						<input name="nome" value="<?php 
+								if (isset($_GET['id_colaborador'])) {
+									echo($linha['nome']);
+								}elseif (isset($_POST['insert']) || isset($_POST['update'])){
+									echo($_POST['nome']);
+								} 
+							?>"><br>			
+				</div>
+				<div>
+					<label>CC:</label>
+						<input name="cc" value="<?php 
+								if (isset($_GET['id_colaborador'])) {
+									echo($linha['CC']);
+								}elseif (isset($_POST['insert']) || isset($_POST['update'])){
+									echo($_POST['cc']);
+								} 
+							?>"><br>
+				</div>
+				<div>
+					<label>NIF:</label>
+						<input name="nif" value="<?php 
+								if (isset($_GET['id_colaborador'])) {
+									echo($linha['NIF']);
+								}elseif (isset($_POST['insert']) || isset($_POST['update'])){
+									echo($_POST['nif']);
+								} 
+							?>"><br>
+				</div>
+				<div>
+					<label>Morada:</label>
+						<input name="morada" value="<?php 
+								if (isset($_GET['id_colaborador'])) {
+									echo($linha['morada']);
+								}elseif (isset($_POST['insert']) || isset($_POST['update'])){
+									echo($_POST['morada']);
+								} 
+							?>"><br>
+				</div>
+				<div>
+					<label>Localidade:</label>
+						<input name="localidade" value="<?php 
+								if (isset($_GET['id_colaborador'])) {
+									echo($linha['localidade']);
+								}elseif (isset($_POST['insert']) || isset($_POST['update'])){
+									echo($_POST['localidade']);
+								} 
+							?>"><br>
+				</div>
+				<div>
+					<label>Freguesia:</label>
+						<input name="freguesia" value="<?php 
+								if (isset($_GET['id_colaborador'])) {
+									echo($linha['freguesia']);
+								}elseif (isset($_POST['insert']) || isset($_POST['update'])){
+									echo($_POST['freguesia']);
+								} 
+							?>"><br>
+				</div>
+				<div>
+					<label>Concelho:</label>
+						<input name="concelho" value="<?php 
+								if (isset($_GET['id_colaborador'])) {
+									echo($linha['concelho']);
+								}elseif (isset($_POST['insert']) || isset($_POST['update'])){
+									echo($_POST['concelho']);
+								} 
+							?>"><br>
+				</div>
+				<div>
+					<label>CP:</label>
+						<input name="cp" value="<?php 
+								if (isset($_GET['id_colaborador'])) {
+									echo($linha['CP']);
+								}elseif (isset($_POST['insert']) || isset($_POST['update'])){
+									echo($_POST['cp']);
+								} 
+							?>"><br>
+				</div>
+				<div>
+					<label>Email:</label>
+						<input name="email" value="<?php 
+								if (isset($_GET['id_colaborador'])) {
+									echo($linha['email']);
+								}elseif (isset($_POST['insert']) || isset($_POST['update'])){
+									echo($_POST['email']);
+								} 
+							?>"><br>
+				</div>
+				<div>
+					<label>Telemovel:</label>
+						<input name="telemovel" value="<?php 
+								if (isset($_GET['id_colaborador'])) {
+									echo($linha['telemovel']);
+								}elseif (isset($_POST['insert']) || isset($_POST['update'])){
+									echo($_POST['telemovel']);
+								} 
+							?>"><br>
+				</div>
+				<div>
+					<label>Sexo:</label>
+						<select id="sexo" name="sexo" onchange="mudar_imagem()">
+							<option value="Masculino">Masculino</option>
+							<option value="Feminino">Feminino</option>
+						</select><br>
+				</div>
+				<div>
+					<label>Data de nascimento:</label>
+						<input type="date" name="dt_nasc" value="<?php 
+								if (isset($_GET['id_colaborador'])) {
+									echo($linha['dt_nasc']);
+								}elseif (isset($_POST['insert']) || isset($_POST['update'])){
+									echo($_POST['dt_nasc']);
+								} 
+							?>"><br>
+				</div>
+				<div>
 					<?php 
 						if (isset($_GET['id_colaborador'])) {
 							$ficheiros=$con->prepare("SELECT * FROM `ficheiros` WHERE id_recurso_humano=$_GET[id_colaborador]");
@@ -501,6 +531,8 @@
 						} 
 					?>
 					<br>
+				</div>
+				<div>
 					<?php 
 						if (isset($_GET['id_colaborador'])) {
 							$ficheiros=$con->prepare("SELECT * FROM `ficheiros` WHERE id_recurso_humano=$_GET[id_colaborador]");
@@ -535,6 +567,8 @@
 						} 
 					?>
 					<br>
+				</div>
+				<div>
 					<?php 
 						if (isset($_GET['id_colaborador'])) {
 							$ficheiros=$con->prepare("SELECT * FROM `ficheiros` WHERE id_recurso_humano=$_GET[id_colaborador]");
@@ -569,11 +603,14 @@
 						} 
 					?>
 					<br>
-				<?php if (isset($_GET['id_colaborador'])) {?>
-					<input type="submit" name="update" value="Atualizar">
-				<?php }else{?>
-					<input type="submit" name="insert" value="Inserir">
-				<?php } ?>
+				</div>
+				<div>
+					<?php if (isset($_GET['id_colaborador'])) {?>
+						<input type="submit" name="update" value="Atualizar">
+					<?php }else{?>
+						<input type="submit" name="insert" value="Inserir">
+					<?php } ?>
+				</div>
 			</form>
 		</div>
 	</body>
