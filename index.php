@@ -1,64 +1,124 @@
 <?php
-	require ('ligacao.php');
-
-	if(isset($_POST['Login'])){
-		if (strpos($_POST['username'], 'T') !== false) {
-			//Define a SESSION['permissao']
-			$_SESSION['permissao']=2;
-			//prepara a query para o login do treinador
-			$stmt = $con->prepare("SELECT * FROM treinadores WHERE num_treinador = ? AND password = ?");
-			//define a procura
-			$stmt -> bind_param("ss",$_POST['username'],$_POST['password']);
-		}else{
-			//Define a SESSION['permissao']
-			$_SESSION['permissao']=1;
-			//prepara a query para o login do admin
-			$stmt = $con->prepare("SELECT * FROM admins WHERE username = ? AND password = ?");
-			//define a procura
-			$stmt -> bind_param("ss",$_POST['username'],$_POST['password']);
-		}
-		//executa a query
-		$stmt->execute();
-
-		//Busca o resultado do select
-		$resultado=$stmt->get_result();
-		//Verifica se tem alguma linha com os valores
-		if($resultado->num_rows === 0){
-			//Não: Sai e dá erro
-			?>
-				<script>
-					window.alert("Dados de Login Incorretos!");
-					window.location.href = "index.php";
-				</script>
-			<?php 
-		}else{
-			//Sim: Busca o conteudo da linha e coloca na var global $_SESSION
-			$row = $resultado->fetch_row();
-			$_SESSION['id']=$row[0];
-			$_SESSION['nome']=$row[1];
-			
-			//fecha a query
-			$stmt->close();
-			//redireciona para a home
-			header("Location: dashboard.php");
-		}	
-	}
+session_start();
 ?>
+<!--**
+ * @author Cesar Szpak - Celke - cesar@celke.com.br
+ * @pagina desenvolvida usando FullCalendar e Bootstrap 4,
+ * o código é aberto e o uso é free, 
+ * porém lembre-se de conceder os créditos ao desenvolvedor.
+ *-->
 <!DOCTYPE html>
 <html>
-<head>
-	<title>Clube estrela azul</title>
-</head>
-<body>
-	<div>
-		<h3>Login</h3>
-		<form method="POST">
-			<label>Username:</label>
-				<input name="username"><br>
-			<label>Password:</label>
-				<input type="Password" name="password"><br>
-			<input type="submit" name="Login">
-		</form>
-	</div>
-</body>
+    <head>
+        <meta charset='utf-8' />
+        <link href='css/core/main.min.css' rel='stylesheet' />
+        <link href='css/daygrid/main.min.css' rel='stylesheet' />
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+        <link rel="stylesheet" href="css/personalizado.css">
+
+        <script src='js/core/main.min.js'></script>
+        <script src='js/interaction/main.min.js'></script>
+        <script src='js/daygrid/main.min.js'></script>
+        <script src='js/core/locales/pt-br.js'></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+        <script src="js/personalizado.js"></script>
+    </head>
+    <body>
+        <?php
+        if(isset($_SESSION['msg'])){
+            echo $_SESSION['msg'];
+            unset($_SESSION['msg']);
+        }
+        ?>
+        <div id='calendar'></div>
+
+        <div class="modal fade" id="visualizar" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Detalhes do Treino</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <dl class="row">
+                            <dt class="col-sm-3">ID do Treino</dt>
+                            <dd class="col-sm-9" id="id_treino"></dd>
+
+                            <dt class="col-sm-3">Tipo de Treino</dt>
+                            <dd class="col-sm-9" id="title"></dd>
+
+                            <dt class="col-sm-3">Início do Treino</dt>
+                            <dd class="col-sm-9" id="start"></dd>
+
+                            <dt class="col-sm-3">Fim do Treino</dt>
+                            <dd class="col-sm-9" id="end"></dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="cadastrar" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">Adicionar Treinos</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <span id="msg-cad"></span>
+                        <form id="addevent" method="POST" enctype="multipart/form-data">
+                            <div class="form-group row">
+                                <label class="col-sm-2 col-form-label">Título</label>
+                                <div class="col-sm-10">
+                                    <input type="text" name="title" class="form-control" id="title" placeholder="Título do evento">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-sm-2 col-form-label">Cor</label>
+                                <div class="col-sm-10">
+                                    <select name="color" class="form-control" id="color">
+                                        <option value="">Selecione</option>			
+                                        <option style="color:#FFD700;" value="#FFD700">Amarelo</option>
+                                        <option style="color:#0071c5;" value="#0071c5">Azul Turquesa</option>
+                                        <option style="color:#FF4500;" value="#FF4500">Laranja</option>
+                                        <option style="color:#8B4513;" value="#8B4513">Marrom</option>	
+                                        <option style="color:#1C1C1C;" value="#1C1C1C">Preto</option>
+                                        <option style="color:#436EEE;" value="#436EEE">Royal Blue</option>
+                                        <option style="color:#A020F0;" value="#A020F0">Roxo</option>
+                                        <option style="color:#40E0D0;" value="#40E0D0">Turquesa</option>
+                                        <option style="color:#228B22;" value="#228B22">Verde</option>
+                                        <option style="color:#8B0000;" value="#8B0000">Vermelho</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-sm-2 col-form-label">Início do Treino</label>
+                                <div class="col-sm-10">
+                                    <input type="text" name="start" class="form-control" id="start" onkeypress="DataHora(event, this)">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-sm-2 col-form-label">Final do Treino</label>
+                                <div class="col-sm-10">
+                                    <input type="text" name="end" class="form-control" id="end"  onkeypress="DataHora(event, this)">
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <div class="col-sm-10">
+                                    <button type="submit" name="CadEvent" id="CadEvent" value="CadEvent" class="btn btn-success">Adicionar</button>                                    
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
 </html>
